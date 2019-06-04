@@ -1,0 +1,8 @@
+---
+client:
+  credentialStore:
+    cryptoStore:
+      path: "/var/fabric-client-kvs_mmOrg"
+    path: "/var/fabric-client-kvs_mmOrg"
+  organization: mmOrg
+verison: '1.0'

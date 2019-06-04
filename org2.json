@@ -1,0 +1,12 @@
+{
+    "client": {
+        "credentialStore": {
+            "cryptoStore": {
+                "path": "/var/fabric-client-kvs_mmOrg"
+            },
+            "path": "/var/fabric-client-kvs_mmOrg"
+        },
+        "organization": "mmOrg"
+    },
+    "version": "1.0"
+}

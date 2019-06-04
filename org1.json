@@ -1,0 +1,12 @@
+{
+    "client": {
+        "credentialStore": {
+            "cryptoStore": {
+                "path": "/var/fabric-client-kvs_btcOrg"
+            },
+            "path": "/var/fabric-client-kvs_btcOrg"
+        },
+        "organization": "btcOrg"
+    },
+    "version": "1.0"
+}

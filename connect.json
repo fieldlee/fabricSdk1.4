@@ -1,0 +1,145 @@
+{
+    "x-type": "hlfv1",
+    "name":"test",
+    
+    "version":"1.0",
+
+    "orderers": {
+		"order0.51mm.com": {
+			"grpcOptions": {
+				"ssl-target-name-override": "order0.51mm.com"
+			},
+			"tlsCACerts": {
+				"path": "/var/certification/7895bbb1d68c478a9c518cd402232e3c/crypto-config/ordererOrganizations/51mm.com/orderers/order0.51mm.com/tls/ca.crt"
+			},
+			"url": "grpcs://192.168.1.110:7050"
+		}
+	},
+	"organizations": {
+		"btcOrg": {
+			"adminPrivateKey": {
+				"path": "/var/certification/7895bbb1d68c478a9c518cd402232e3c/crypto-config/peerOrganizations/btcOrg.51mm.com/users/Admin@btcOrg.51mm.com/msp/keystore/4266ce250bb69f1d16e8eebf521ff6a98323971bc254b5d079ce54a110c4b9fd_sk"
+			},
+			"certificateAuthorities": ["ca.btcOrg.51mm.com"],
+			"mspid": "btcOrg",
+			"peers": ["peer0.btcOrg.51mm.com", "peer1.btcOrg.51mm.com"],
+			"signedCert": {
+				"path": "/var/certification/7895bbb1d68c478a9c518cd402232e3c/crypto-config/peerOrganizations/btcOrg.51mm.com/users/Admin@btcOrg.51mm.com/msp/signcerts/Admin@btcOrg.51mm.com-cert.pem"
+			}
+		},
+		"mmOrg": {
+			"adminPrivateKey": {
+				"path": "/var/certification/7895bbb1d68c478a9c518cd402232e3c/crypto-config/peerOrganizations/mmOrg.51mm.com/users/Admin@mmOrg.51mm.com/msp/keystore/fe85294f73bdbf93852366b81709b031f4363dd2bb944a73322d9222cfc1f1ff_sk"
+			},
+			"certificateAuthorities": ["ca.mmOrg.51mm.com"],
+			"mspid": "mmOrg",
+			"peers": ["peer0.mmOrg.51mm.com", "peer1.mmOrg.51mm.com"],
+			"signedCert": {
+				"path": "/var/certification/7895bbb1d68c478a9c518cd402232e3c/crypto-config/peerOrganizations/mmOrg.51mm.com/users/Admin@mmOrg.51mm.com/msp/signcerts/Admin@mmOrg.51mm.com-cert.pem"
+			}
+		}
+	},
+	"channels": {
+		"mmchannel": {
+			"orderers": ["order0.51mm.com"],
+			"peers": {
+				"peer0.btcOrg.51mm.com": {
+					"chaincodeQuery": true,
+					"endorsingPeer": true,
+					"eventSource": true,
+					"ledgerQuery": true
+				},
+				"peer0.mmOrg.51mm.com": {
+					"chaincodeQuery": true,
+					"endorsingPeer": true,
+					"eventSource": true,
+					"ledgerQuery": true
+				},
+				"peer1.btcOrg.51mm.com": {
+					"chaincodeQuery": true,
+					"endorsingPeer": false,
+					"eventSource": false,
+					"ledgerQuery": true
+				},
+				"peer1.mmOrg.51mm.com": {
+					"chaincodeQuery": true,
+					"endorsingPeer": false,
+					"eventSource": false,
+					"ledgerQuery": true
+				}
+			}
+		}
+	},
+	"peers": {
+		"peer0.btcOrg.51mm.com": {
+			"eventUrl": "grpcs://192.168.1.110:9053",
+			"grpcOptions": {
+				"ssl-target-name-override": "peer0.btcOrg.51mm.com"
+			},
+			"tlsCACerts": {
+				"path": "/var/certification/7895bbb1d68c478a9c518cd402232e3c/crypto-config/peerOrganizations/btcOrg.51mm.com/peers/peer0.btcOrg.51mm.com/tls/ca.crt"
+			},
+			"url": "grpcs://192.168.1.110:9051"
+		},
+		"peer0.mmOrg.51mm.com": {
+			"eventUrl": "grpcs://192.168.1.110:7053",
+			"grpcOptions": {
+				"ssl-target-name-override": "peer0.mmOrg.51mm.com"
+			},
+			"tlsCACerts": {
+				"path": "/var/certification/7895bbb1d68c478a9c518cd402232e3c/crypto-config/peerOrganizations/mmOrg.51mm.com/peers/peer0.mmOrg.51mm.com/tls/ca.crt"
+			},
+			"url": "grpcs://192.168.1.110:7051"
+		},
+		"peer1.btcOrg.51mm.com": {
+			"eventUrl": "grpcs://192.168.1.110:10053",
+			"grpcOptions": {
+				"ssl-target-name-override": "peer1.btcOrg.51mm.com"
+			},
+			"tlsCACerts": {
+				"path": "/var/certification/7895bbb1d68c478a9c518cd402232e3c/crypto-config/peerOrganizations/btcOrg.51mm.com/peers/peer1.btcOrg.51mm.com/tls/ca.crt"
+			},
+			"url": "grpcs://192.168.1.110:10051"
+		},
+		"peer1.mmOrg.51mm.com": {
+			"eventUrl": "grpcs://192.168.1.110:8053",
+			"grpcOptions": {
+				"ssl-target-name-override": "peer1.mmOrg.51mm.com"
+			},
+			"tlsCACerts": {
+				"path": "/var/certification/7895bbb1d68c478a9c518cd402232e3c/crypto-config/peerOrganizations/mmOrg.51mm.com/peers/peer1.mmOrg.51mm.com/tls/ca.crt"
+			},
+			"url": "grpcs://192.168.1.110:8051"
+		}
+	},
+	"certificateAuthorities": {
+		"ca.btcOrg.51mm.com": {
+			"caName": "ca.btcOrg.51mm.com",
+			"httpOptions": {
+				"verify": true
+			},
+			"registrar": [{
+				"enrollId": "admin",
+				"enrollSecret": "adminpw"
+			}],
+			"tlsCACerts": {
+				"path": "/var/certification/7895bbb1d68c478a9c518cd402232e3c/crypto-config/peerOrganizations/btcOrg.51mm.com/ca/ca.btcOrg.51mm.com-cert.pem"
+			},
+			"url": "https://192.168.1.110:9054"
+		},
+		"ca.mmOrg.51mm.com": {
+			"caName": "ca.mmOrg.51mm.com",
+			"httpOptions": {
+				"verify": false
+			},
+			"registrar": [{
+				"enrollId": "admin",
+				"enrollSecret": "adminpw"
+			}],
+			"tlsCACerts": {
+				"path": "/var/certification/7895bbb1d68c478a9c518cd402232e3c/crypto-config/peerOrganizations/mmOrg.51mm.com/ca/ca.mmOrg.51mm.com-cert.pem"
+			},
+			"url": "https://192.168.1.110:7054"
+		}
+	}
+}
