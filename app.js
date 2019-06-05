@@ -14,12 +14,7 @@ var jwt = require('jsonwebtoken');
 var bearerToken = require('express-bearer-token');
 var cors = require('cors');
 
-
 var hfc = require('fabric-client');
-
-// hfc.setConfigSetting('network-connection-profile-path',path.join(__dirname, 'connect.json'));
-// hfc.setConfigSetting('mmOrg-connection-profile-path',path.join(__dirname, 'org1.json'));
-// hfc.setConfigSetting('btcOrg-connection-profile-path',path.join(__dirname, 'org2.json'));
 
 hfc.addConfigFile(path.join(__dirname, 'config.json'));
 
@@ -293,6 +288,7 @@ app.post('/channels/chaincodes', async function(req, res) {
 	if (!chaincodeType) {
 		chaincodeType = "golang";
 	}
+
 	if (!args) {
 		res.json(getErrorMessage('\'args\''));
 		return;
