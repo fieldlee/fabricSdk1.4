@@ -244,7 +244,10 @@ app.post('/chaincodes', async function(req, res) {
         chaincodeType = "golang";
 	}
 	let message = await install.installChaincode(peers, chaincodeName, chaincodePath, chaincodeVersion, chaincodeType, req.username, req.orgname)
-	res.send(message);});
+	res.send(message);
+});
+
+
 // Instantiate chaincode on target peers
 // curl -s -X POST \
 // http://localhost:4000/channels/chaincodes \
