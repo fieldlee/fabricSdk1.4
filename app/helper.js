@@ -24,16 +24,13 @@ var util = require('util');
 var hfc = require('fabric-client');
 hfc.setLogger(logger);
 var ORGS = hfc.getConfigSetting('network-config');
-
+var CONNECT = hfc.getConfigSetting('connect_profile');
 async function getClientForOrg (userorg, username) {
 	logger.debug('getClientForOrg - ****** START %s %s', userorg, username);
 
-	let config = '-connection-profile-path';
-	// build a client context and load it with a connection profile
-	// lets only load the network settings and save the client for later
-	let client = hfc.loadFromConfig(hfc.getConfigSetting('network'+config));
+	let client = hfc.loadFromConfig(CONNECT);
 
-	client.loadFromConfig(hfc.getConfigSetting(userorg+config));
+	client.loadFromConfig(ORGS[userorg]);
 
 	await client.initCredentialStores();
 

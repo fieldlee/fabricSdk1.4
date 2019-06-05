@@ -1,8 +1,0 @@
----
-client:
-  credentialStore:
-    cryptoStore:
-      path: "/var/fabric-client-kvs_btcOrg"
-    path: "/var/fabric-client-kvs_btcOrg"
-  organization: btcOrg
-verison: '1.0'

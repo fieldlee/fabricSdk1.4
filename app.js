@@ -17,9 +17,9 @@ var cors = require('cors');
 
 var hfc = require('fabric-client');
 
-hfc.setConfigSetting('network-connection-profile-path',path.join(__dirname, 'connect.json'));
-hfc.setConfigSetting('mmOrg-connection-profile-path',path.join(__dirname, 'org1.json'));
-hfc.setConfigSetting('btcOrg-connection-profile-path',path.join(__dirname, 'org2.json'));
+// hfc.setConfigSetting('network-connection-profile-path',path.join(__dirname, 'connect.json'));
+// hfc.setConfigSetting('mmOrg-connection-profile-path',path.join(__dirname, 'org1.json'));
+// hfc.setConfigSetting('btcOrg-connection-profile-path',path.join(__dirname, 'org2.json'));
 
 hfc.addConfigFile(path.join(__dirname, 'config.json'));
 
