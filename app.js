@@ -45,12 +45,12 @@ app.set('secret', 'thisismysecret');
 app.use(expressJWT({
 	secret: 'thisismysecret'
 }).unless({
-	path: ['/login']
+	path: ['/login','/invoke']
 }));
 app.use(bearerToken());
 app.use(function(req, res, next) {
 	logger.debug(' ------>>>>>> new request for %s',req.originalUrl);
-	if (req.originalUrl.indexOf('/login') >= 0) {
+	if (req.originalUrl.indexOf('/login') >= 0  || req.originalUrl.indexOf('/invoke') >= 0) {
 		return next();
 	}
 
@@ -301,17 +301,27 @@ app.post('/channels/chaincodes', async function(req, res) {
 	res.send(message);
 });
 // Invoke transaction on chaincode on target peers
-app.post('/channels/:channelName/chaincodes/:chaincodeName', async function(req, res) {
+app.post('/invoke', async function(req, res) {
 	logger.debug('==================== INVOKE ON CHAINCODE ==================');
 	var peers = req.body.peers;
-	var chaincodeName = req.params.chaincodeName;
-	var channelName = req.params.channelName;
+	var chaincodeName = req.body.chaincodeName;
+	var channelName = req.body.channelName;
+	var username = req.body.username;
+	var orgname = req.body.orgname;
 	var fcn = req.body.fcn;
 	var args = req.body.args;
 	logger.debug('channelName  : ' + channelName);
 	logger.debug('chaincodeName : ' + chaincodeName);
 	logger.debug('fcn  : ' + fcn);
 	logger.debug('args  : ' + args);
+	if (!username) {
+		res.json(getErrorMessage('\'username\''));
+		return;
+	}
+	if (!orgname) {
+		res.json(getErrorMessage('\'orgname\''));
+		return;
+	}
 	if (!chaincodeName) {
 		res.json(getErrorMessage('\'chaincodeName\''));
 		return;
@@ -329,7 +339,7 @@ app.post('/channels/:channelName/chaincodes/:chaincodeName', async function(req,
 		return;
 	}
 
-	let message = await invoke.invokeChaincode(peers, channelName, chaincodeName, fcn, args, req.username, req.orgname);
+	let message = await invoke.invokeChaincode(peers, channelName, chaincodeName, fcn, args, username, orgname);
 	res.send(message);
 });
 // Query on chaincode on target peers
