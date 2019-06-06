@@ -83,7 +83,7 @@ const invokeChaincode = async function(peerNames, channelName, chaincodeName, fc
 				'Successfully sent Proposal and received ProposalResponse: Status - %s, message - "%s", metadata - "%s", endorsement signature: %s',
 				proposalResponses[0].response.status, proposalResponses[0].response.message,
 				proposalResponses[0].response.payload, proposalResponses[0].endorsement.signature));
-			successInfo = proposalResponses[0].response.payload;
+			successInfo = proposalResponses[0].response.payload.toString();
 			// wait for the channel-based event hub to tell us
 			// that the commit was good or bad on each peer in our organization
 			const promises = [];
