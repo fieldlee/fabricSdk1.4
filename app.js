@@ -322,13 +322,18 @@ app.post('/invoke', async function(req, res) {
 		res.json(getErrorMessage('\'orgname\''));
 		return;
 	}
+
+	if (!peers) {
+		peers = ["peer0."+orgname+".51mm.com","peer1."+orgname+".51mm.com"];
+	}
+	// "peers":["peer0.btcOrg.51mm.com","peer1.btcOrg.51mm.com"],
+	// "channelName":"mmchannel",
+	// "chaincodeName":"ledger",
 	if (!chaincodeName) {
-		res.json(getErrorMessage('\'chaincodeName\''));
-		return;
+		chaincodeName = "ledger";
 	}
 	if (!channelName) {
-		res.json(getErrorMessage('\'channelName\''));
-		return;
+		channelName = "mmchannel";
 	}
 	if (!fcn) {
 		res.json(getErrorMessage('\'fcn\''));
