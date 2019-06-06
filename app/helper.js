@@ -37,7 +37,7 @@ async function getClientForOrg (userorg, username) {
 	if(username) {
 		let user = await client.getUserContext(username, true);
 		if(!user) {
-			throw new Error(util.format('User was not found :', username));
+			throw new Error(util.format('{"status":400,"message":"User was not found : %s"}', username));
 		} else {
 			logger.debug('User %s was found to be registered and enrolled', username);
 		}
