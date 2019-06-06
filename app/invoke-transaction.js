@@ -21,6 +21,7 @@ const logger = helper.getLogger('invoke-chaincode');
 const invokeChaincode = async function(peerNames, channelName, chaincodeName, fcn, args, username, org_name) {
 	logger.debug(util.format('\n============ invoke transaction on channel %s ============\n', channelName));
 	let error_message = null;
+	var successInfo = "";
 	let tx_id_string = null;
 	let client = null;
 	let channel = null;
@@ -72,13 +73,13 @@ const invokeChaincode = async function(peerNames, channelName, chaincodeName, fc
 				logger.error(error_message);
 			}
 		}
-
+		
 		if (all_good) {
 			logger.info(util.format(
 				'Successfully sent Proposal and received ProposalResponse: Status - %s, message - "%s", metadata - "%s", endorsement signature: %s',
 				proposalResponses[0].response.status, proposalResponses[0].response.message,
 				proposalResponses[0].response.payload, proposalResponses[0].endorsement.signature));
-
+			successInfo = proposalResponses[0].response.payload;
 			// wait for the channel-based event hub to tell us
 			// that the commit was good or bad on each peer in our organization
 			const promises = [];
@@ -90,7 +91,7 @@ const invokeChaincode = async function(peerNames, channelName, chaincodeName, fc
 						let message = 'REQUEST_TIMEOUT:' + eh.getPeerAddr();
 						logger.error(message);
 						eh.disconnect();
-					}, 3000);
+					}, 6000);
 					eh.registerTxEvent(tx_id_string, (tx, code, block_num) => {
 						logger.info('The chaincode invoke chaincode transaction has been committed on peer %s',eh.getPeerAddr());
 						logger.info('Transaction %s has status of %s in blocl %s', tx, code, block_num);
@@ -173,7 +174,9 @@ const invokeChaincode = async function(peerNames, channelName, chaincodeName, fc
 	} else {
 		logger.info(message);
 	}
-
+	if (successInfo != ""){
+		message = successInfo;
+	}
 	// build a response to send back to the REST caller
 	const response = {
 		success: success,
