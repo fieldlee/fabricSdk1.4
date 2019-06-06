@@ -21,7 +21,8 @@ const logger = helper.getLogger('invoke-chaincode');
 const invokeChaincode = async function(peerNames, channelName, chaincodeName, fcn, args, username, org_name) {
 	logger.debug(util.format('\n============ invoke transaction on channel %s ============\n', channelName));
 	let error_message = null;
-	var successInfo = "";
+	let successInfo = null;
+	let failedInfo = null;
 	let tx_id_string = null;
 	let client = null;
 	let channel = null;
@@ -63,6 +64,9 @@ const invokeChaincode = async function(peerNames, channelName, chaincodeName, fc
 		for (const i in proposalResponses) {
 			if (proposalResponses[i] instanceof Error) {
 				all_good = false;
+				if (failedInfo == null){
+					failedInfo = proposalResponses[i].toString()
+				} 
 				error_message = util.format('invoke chaincode proposal resulted in an error :: %s', proposalResponses[i].toString());
 				logger.error(error_message);
 			} else if (proposalResponses[i].response && proposalResponses[i].response.status === 200) {
@@ -168,13 +172,18 @@ const invokeChaincode = async function(peerNames, channelName, chaincodeName, fc
 		'Successfully invoked the chaincode %s to the channel \'%s\' for transaction ID: %s',
 		org_name, channelName, tx_id_string);
 	if (error_message) {
-		message = util.format('Failed to invoke chaincode. cause:%s',error_message);
 		success = false;
 		logger.error(message);
 	} else {
 		logger.info(message);
 	}
-	if (successInfo != ""){
+
+	if (failedInfo !== null){
+		success = true;
+		message = failedInfo
+	}
+	if (successInfo !== null){
+		success = true;
 		message = successInfo;
 	}
 	// build a response to send back to the REST caller
