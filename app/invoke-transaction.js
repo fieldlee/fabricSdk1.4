@@ -65,7 +65,7 @@ const invokeChaincode = async function(peerNames, channelName, chaincodeName, fc
 			if (proposalResponses[i] instanceof Error) {
 				all_good = false;
 				if (failedInfo == null){
-					failedInfo = proposalResponses[i].toString()
+					failedInfo = proposalResponses[i].toString().replace("Error: ","")
 				} 
 				error_message = util.format('invoke chaincode proposal resulted in an error :: %s', proposalResponses[i].toString());
 				logger.error(error_message);
@@ -189,7 +189,7 @@ const invokeChaincode = async function(peerNames, channelName, chaincodeName, fc
 	// build a response to send back to the REST caller
 	const response = {
 		success: success,
-		message: message
+		info: message
 	};
 	return response;
 };
