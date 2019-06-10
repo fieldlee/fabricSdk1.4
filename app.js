@@ -101,7 +101,7 @@ function getErrorMessage(field) {
 
 app.post('/login', async function(req, res) {
 	var username = req.body.username;
-	var orgName = req.body.orgName;
+	var orgName = req.body.orgname;
 	logger.debug('End point : /users');
 	logger.debug('User name : ' + username);
 	logger.debug('Org name  : ' + orgName);
