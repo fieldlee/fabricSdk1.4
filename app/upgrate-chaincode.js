@@ -16,14 +16,12 @@
 'use strict';
 const util = require('util');
 const helper = require('./helper.js');
-const logger = helper.getLogger('invoke-chaincode');
+const logger = helper.getLogger('upgrate-chaincode');
 
-const invokeChaincode = async function(peerNames, channelName, chaincodeName, fcn, args, username, org_name) {
-	logger.debug(util.format('\n============ invoke transaction on channel %s ============\n', channelName));
+const upgrateChaincode = async function(peers, channelName, chaincodeName, chaincodeVersion, functionName, chaincodeType, args, username, org_name) {
+	logger.debug('\n\n============ Upgrate chaincode on channel ' + channelName +
+		' ============\n');
 	let error_message = null;
-	let successInfo = null;
-	let failedInfo = null;
-	let tx_id_string = null;
 	let client = null;
 	let channel = null;
 	try {
@@ -36,21 +34,39 @@ const invokeChaincode = async function(peerNames, channelName, chaincodeName, fc
 			logger.error(message);
 			throw new Error(message);
 		}
-		const tx_id = client.newTransactionID();
+		const tx_id = client.newTransactionID(true); // Get an admin based transactionID
+		                                       // An admin based transactionID will
+		                                       // indicate that admin identity should
+		                                       // be used to sign the proposal request.
 		// will need the transaction ID string for the event registration later
-		tx_id_string = tx_id.getTransactionID();
+		const deployId = tx_id.getTransactionID();
 
 		// send proposal to endorser
 		const request = {
-			targets: peerNames,
+			targets : peers,
 			chaincodeId: chaincodeName,
-			fcn: fcn,
+			chaincodeType: chaincodeType,
+			chaincodeVersion: chaincodeVersion,
 			args: args,
-			chainId: channelName,
 			txId: tx_id
+
+			// Use this to demonstrate the following policy:
+			// The policy can be fulfilled when members from both orgs signed.
+			// 'endorsement-policy': {
+			//         identities: [
+			// 		{ role: { name: 'member', mspId: 'mmOrg' }},
+			// 		{ role: { name: 'member', mspId: 'btcOrg' }}
+			//         ],
+			//         policy: {
+			// 		'2-of':[{ 'signed-by': 0 }, { 'signed-by': 1 }]
+			//         }
+		    //     }
 		};
 
-		let results = await channel.sendTransactionProposal(request);
+		if (functionName)
+			request.fcn = functionName;
+
+		let results = await channel.sendUpgradeProposal(request, 60000); //upgrade takes much longer
 
 		// the returned object has both the endorsement results
 		// and the actual proposal, the proposal will be needed
@@ -64,49 +80,47 @@ const invokeChaincode = async function(peerNames, channelName, chaincodeName, fc
 		for (const i in proposalResponses) {
 			if (proposalResponses[i] instanceof Error) {
 				all_good = false;
-				if (failedInfo == null){
-					failedInfo = proposalResponses[i].toString().replace("Error: ","")
-				} 
-				error_message = util.format('invoke chaincode proposal resulted in an error :: %s', proposalResponses[i].toString());
+				error_message = util.format('upgrade proposal resulted in an error :: %s', proposalResponses[i].toString());
 				logger.error(error_message);
 			} else if (proposalResponses[i].response && proposalResponses[i].response.status === 200) {
-				logger.info('invoke chaincode proposal was good');
+				logger.info('upgrade proposal was good');
 			} else {
 				all_good = false;
-				error_message = util.format('invoke chaincode proposal failed for an unknown reason %j', proposalResponses[i]);
+				error_message = util.format('upgrade proposal was bad for an unknown reason %j', proposalResponses[i]);
 				logger.error(error_message);
 			}
 		}
-		
+
 		if (all_good) {
 			logger.info(util.format(
 				'Successfully sent Proposal and received ProposalResponse: Status - %s, message - "%s", metadata - "%s", endorsement signature: %s',
 				proposalResponses[0].response.status, proposalResponses[0].response.message,
 				proposalResponses[0].response.payload, proposalResponses[0].endorsement.signature));
-			successInfo = proposalResponses[0].response.payload.toString();
-			// wait for the channel-based event hub to tell us
-			// that the commit was good or bad on each peer in our organization
+
+			// wait for the channel-based event hub to tell us that the
+			// instantiate transaction was committed on the peer
 			const promises = [];
-			let event_hubs = channel.getChannelEventHubsForOrg();
+			const event_hubs = channel.getChannelEventHubsForOrg();
+			logger.debug('found %s eventhubs for this organization %s',event_hubs.length, org_name);
 			event_hubs.forEach((eh) => {
-				logger.debug('invokeEventPromise - setting up event');
-				let invokeEventPromise = new Promise((resolve, reject) => {
+				let instantiateEventPromise = new Promise((resolve, reject) => {
+					logger.debug('instantiateEventPromise - setting up event');
 					let event_timeout = setTimeout(() => {
 						let message = 'REQUEST_TIMEOUT:' + eh.getPeerAddr();
 						logger.error(message);
 						eh.disconnect();
-					}, 6000);
-					eh.registerTxEvent(tx_id_string, (tx, code, block_num) => {
-						logger.info('The chaincode invoke chaincode transaction has been committed on peer %s',eh.getPeerAddr());
+					}, 60000);
+					eh.registerTxEvent(deployId, (tx, code, block_num) => {
+						logger.info('The chaincode instantiate transaction has been committed on peer %s',eh.getPeerAddr());
 						logger.info('Transaction %s has status of %s in blocl %s', tx, code, block_num);
 						clearTimeout(event_timeout);
 
 						if (code !== 'VALID') {
-							let message = util.format('The invoke chaincode transaction was invalid, code:%s',code);
+							let message = util.format('The chaincode instantiate transaction was invalid, code:%s',code);
 							logger.error(message);
 							reject(new Error(message));
 						} else {
-							let message = 'The invoke chaincode transaction was valid.';
+							let message = 'The chaincode instantiate transaction was valid.';
 							logger.info(message);
 							resolve(message);
 						}
@@ -123,11 +137,15 @@ const invokeChaincode = async function(peerNames, channelName, chaincodeName, fc
 					);
 					eh.connect();
 				});
-				promises.push(invokeEventPromise);
+				promises.push(instantiateEventPromise);
 			});
 
 			const orderer_request = {
-				txId: tx_id,
+				txId: tx_id, // must include the transaction id so that the outbound
+							// transaction to the orderer will be signed by the admin id
+							// the same as the proposal above, notice that transactionID
+							// generated above was based on the admin id not the current
+							// user assigned to the 'client' instance.
 				proposalResponses: proposalResponses,
 				proposal: proposal
 			};
@@ -135,9 +153,9 @@ const invokeChaincode = async function(peerNames, channelName, chaincodeName, fc
 			// put the send to the orderer last so that the events get registered and
 			// are ready for the orderering and committing
 			promises.push(sendPromise);
-			let results = await Promise.all(promises);
+			const results = await Promise.all(promises);
 			logger.debug(util.format('------->>> R E S P O N S E : %j', results));
-			let response = results.pop(); //  orderer results are last in the results
+			const response = results.pop(); //  orderer results are last in the results
 			if (response.status === 'SUCCESS') {
 				logger.info('Successfully sent transaction to the orderer.');
 			} else {
@@ -146,9 +164,9 @@ const invokeChaincode = async function(peerNames, channelName, chaincodeName, fc
 			}
 
 			// now see what each of the event hubs reported
-			for(let i in results) {
-				let event_hub_result = results[i];
-				let event_hub = event_hubs[i];
+			for(const i in results) {
+				const event_hub_result = results[i];
+				const event_hub = event_hubs[i];
 				logger.debug('Event results for event hub :%s',event_hub.getPeerAddr());
 				if(typeof event_hub_result === 'string') {
 					logger.debug(event_hub_result);
@@ -159,7 +177,7 @@ const invokeChaincode = async function(peerNames, channelName, chaincodeName, fc
 			}
 		}
 	} catch (error) {
-		logger.error('Failed to invoke due to error: ' + error.stack ? error.stack : error);
+		logger.error('Failed to send instantiate due to error: ' + error.stack ? error.stack : error);
 		error_message = error.toString();
 	} finally {
 		if (channel) {
@@ -168,31 +186,20 @@ const invokeChaincode = async function(peerNames, channelName, chaincodeName, fc
 	}
 
 	let success = true;
-	let message = util.format(
-		'Successfully invoked the chaincode %s to the channel \'%s\' for transaction ID: %s',
-		org_name, channelName, tx_id_string);
+	let message = util.format('Successfully instantiate chaincode in organization %s to the channel \'%s\'', org_name, channelName);
 	if (error_message) {
+		message = util.format('Failed to instantiate the chaincode. cause:%s',error_message);
 		success = false;
 		logger.error(message);
 	} else {
 		logger.info(message);
 	}
 
-	if (failedInfo !== null){
-		success = true;
-		message = failedInfo
-	}
-	if (successInfo !== null){
-		success = true;
-		message = successInfo;
-	}
 	// build a response to send back to the REST caller
 	const response = {
 		success: success,
-		txid:tx_id_string,
-		info: message
+		message: message
 	};
 	return response;
 };
-
-exports.invokeChaincode = invokeChaincode;
+exports.upgrateChaincode = upgrateChaincode;
