@@ -75,5 +75,5 @@ var RegisterEvent = async function () {
     logger.debug("===========================================register=============");
 };
 
-await RegisterEvent();
+RegisterEvent();
 logger.debug("===========================================RegisterEvent=============");
