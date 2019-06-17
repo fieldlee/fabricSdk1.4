@@ -72,6 +72,7 @@ var RegisterEvent = async function () {
     listenerTx.register();
     listenerPay.register();
     listenerBlock.register();
+    logger.debug("===========================================register=============");
 };
 
 RegisterEvent();
