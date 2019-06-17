@@ -1,7 +1,7 @@
 var fs = require('fs');
 var path = require('path');
 var hfc = require('fabric-client');
-var {Gateway,FileSystemWallet} = require('fabric-network');
+var {Gateway,FileSystemWallet,X509WalletMixin} = require('fabric-network');
 var helper = require('./helper.js');
 var logger = helper.getLogger('Event-Contract');
 
