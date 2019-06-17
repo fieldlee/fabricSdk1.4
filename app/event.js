@@ -46,7 +46,7 @@ var RegisterEvent = async function(){
             console.log(event);
             logger.debug(`Block Number: ${blockNumber} Transaction ID: ${transactionId} Status: ${status}`)
             console.log(`Block Number: ${blockNumber} Transaction ID: ${transactionId} Status: ${status}`);
-        });
+        },{unregister:false,disconnect:false});
         
         contract.addContractListener('ledger', '[0-9a-f]{64}', (err, event, blockNumber, transactionId, status) => {
             if (err) {
@@ -58,7 +58,7 @@ var RegisterEvent = async function(){
             console.log(event);
             logger.debug(`Block Number: ${blockNumber} Transaction ID: ${transactionId} Status: ${status}`)
             console.log(`Block Number: ${blockNumber} Transaction ID: ${transactionId} Status: ${status}`);
-        })
+        },{unregister:false,disconnect:false});
     }
 };
 
