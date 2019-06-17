@@ -12,6 +12,7 @@ const gateway = new Gateway();
 const wallet = new FileSystemWallet('/var/wallet');
 
 
+var RegisterEvent = async function(){
     const adminExists = await wallet.exists('admin');
     if (adminExists) {
         console.log('An identity for the admin user "admin" already exists in the wallet');
@@ -59,3 +60,6 @@ const wallet = new FileSystemWallet('/var/wallet');
             console.log(`Block Number: ${blockNumber} Transaction ID: ${transactionId} Status: ${status}`);
         })
     }
+};
+
+RegisterEvent();
