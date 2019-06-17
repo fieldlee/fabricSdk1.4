@@ -15,7 +15,7 @@ const gatewayOptions = {
     discovery: { enabled: true, asLocalhost: false },
 };
 
-await gateway.connect(connectionProfile, gatewayOptions);
+ gateway.connect(connectionProfile, gatewayOptions);
 const network = await gateway.getNetwork('mmchannel');
 const contract = network.getContract('ledger');
 
