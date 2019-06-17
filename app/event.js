@@ -59,6 +59,8 @@ var RegisterEvent = async function () {
         console.log(`Block Number: ${blockNumber} Transaction ID: ${transactionId} Status: ${status}`);
     }, { unregister: false, disconnect: false });
 
+    listenerTx.register();
+    listenerPay.register();
 };
 
 RegisterEvent();
