@@ -1,6 +1,7 @@
 var fs = require('fs');
 var path = require('path');
 var hfc = require('fabric-client');
+const { Gateway } = require('fabric-network');
 var helper = require('./helper.js');
 var logger = helper.getLogger('Event-Contract');
 
@@ -15,8 +16,8 @@ const gatewayOptions = {
     discovery: { enabled: true, asLocalhost: false },
 };
 
- gateway.connect(connectionProfile, gatewayOptions);
-const network =  gateway.getNetwork('mmchannel');
+await gateway.connect(connectionProfile, gatewayOptions);
+const network = await gateway.getNetwork('mmchannel');
 const contract = network.getContract('ledger');
 
 /**
