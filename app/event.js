@@ -12,8 +12,7 @@ const gateway = new Gateway();
 const wallet = new FileSystemWallet('/var/fabric-client-kvs_mmOrg');
 const gatewayOptions = {
     wallet: wallet, 
-    identity: "fieldlee@mmOrg.51mm.com", 
-    discovery: { enabled: true, asLocalhost: false },
+    identity: "fieldlee@51mm.com"
 };
 
 gateway.connect(connectionProfile, gatewayOptions).then(()=>{
