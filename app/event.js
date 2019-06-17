@@ -36,7 +36,7 @@ var RegisterEvent = async function(){
 
         const contract = network.getContract('ledger');
 
-        contract.addContractListener('ledger-transfer-listener', 'LEDGER_TX_[^ ]+', (err, event, blockNumber, transactionId, status) => {
+        contract.addContractListener('ledger-transfer-listener', 'LEDGER_TX_fieldlee+', (err, event, blockNumber, transactionId, status) => {
             if (err) {
                 console.error(err);
                 logger.error(err);
