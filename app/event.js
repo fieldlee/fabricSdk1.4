@@ -1,6 +1,6 @@
 var fs = require('fs');
 var path = require('path');
-
+var hfc = require('fabric-client');
 var helper = require('./helper.js');
 var logger = helper.getLogger('Event-Contract');
 
