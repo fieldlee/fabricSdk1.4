@@ -16,7 +16,7 @@ const gatewayOptions = {
 };
 
  gateway.connect(connectionProfile, gatewayOptions);
-const network = await gateway.getNetwork('mmchannel');
+const network =  gateway.getNetwork('mmchannel');
 const contract = network.getContract('ledger');
 
 /**
