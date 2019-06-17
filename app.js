@@ -517,4 +517,4 @@ app.get('/channels', async function(req, res) {
 
 ////// ===============================event
 var RegEvent = require('./app/event.js');
-RegEvent.RegisterEvent();
+await RegEvent.RegisterEvent();
