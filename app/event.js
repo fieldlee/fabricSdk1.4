@@ -9,10 +9,10 @@ var ORGS = hfc.getConfigSetting('network-config');
 var connectionProfile = hfc.getConfigSetting('connect_profile');
 
 const gateway = new Gateway();
-const wallet = new FileSystemWallet('/var/fabric-client-kvs_mmOrg');
+const wallet = new FileSystemWallet('/var/wallet');
 const gatewayOptions = {
     wallet: wallet, 
-    identity: "fieldlee@51mm.com"
+    identity: "fieldlee"
 };
 
 gateway.connect(connectionProfile, gatewayOptions).then(()=>{
