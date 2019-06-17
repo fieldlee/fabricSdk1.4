@@ -59,8 +59,19 @@ var RegisterEvent = async function () {
         console.log(`Block Number: ${blockNumber} Transaction ID: ${transactionId} Status: ${status}`);
     }, { unregister: false, disconnect: false });
 
+
+
+    const listenerBlock = await network.addBlockListener('my-block-listener', (error, block) => {
+        if (err) {
+            console.error(err);
+            return;
+        }
+        console.log(`Block: ${block}`);
+    })
+
     listenerTx.register();
     listenerPay.register();
+    listenerBlock.register();
 };
 
 RegisterEvent();
