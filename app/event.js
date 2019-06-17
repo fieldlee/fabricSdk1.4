@@ -35,7 +35,7 @@ var RegisterEvent = async function () {
 
     const contract = network.getContract('ledger');
 
-    contract.addContractListener('ledger', 'LEDGER_TX_fieldlee', (err, event, blockNumber, transactionId, status) => {
+    const listenerTx = await contract.addContractListener('ledger', 'LEDGER_TX_fieldlee', (err, event, blockNumber, transactionId, status) => {
         if (err) {
             console.error(err);
             logger.error(err);
@@ -47,7 +47,7 @@ var RegisterEvent = async function () {
         console.log(`Block Number: ${blockNumber} Transaction ID: ${transactionId} Status: ${status}`);
     }, { unregister: false, disconnect: false });
 
-    contract.addContractListener('ledger', '[0-9a-f]{64}', (err, event, blockNumber, transactionId, status) => {
+    const listenerPay = await contract.addContractListener('ledger', '[0-9a-f]{64}', (err, event, blockNumber, transactionId, status) => {
         if (err) {
             console.error(err);
             logger.error(err);
