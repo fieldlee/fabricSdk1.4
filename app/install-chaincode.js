@@ -27,7 +27,7 @@ var installChaincode = async function(peers, chaincodeName, chaincodePath,
 		logger.info('Calling peers in organization "%s" to join the channel', org_name);
 
 		// first setup the client for this org
-		var client = await helper.getClientForOrg(org_name, username);
+		var client = await helper.getClientForOrg(org_name);  // username
 		logger.debug('Successfully got the fabric client for the organization "%s"', org_name);
 
 		var request = {
