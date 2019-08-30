@@ -360,13 +360,15 @@ app.post('/invoke', async function(req, res) {
 	logger.debug('fcn  : ' + fcn);
 	logger.debug('args  : ' + args);
 	if (!username) {
-		res.json(getErrorMessage('\'username\''));
-		return;
-	}
-	if (!orgname) {
-		res.json(getErrorMessage('\'orgname\''));
-		return;
-	}
+        //      res.json(getErrorMessage('\'username\''));
+        //      return;
+        }
+    if (!orgname) {
+                orgname = "mmOrg";
+        //      res.json(getErrorMessage('\'orgname\''));
+        //      return;
+        }
+
 
 	if (!peers) {
 		peers = ["peer0."+orgname+".51mm.com","peer1."+orgname+".51mm.com"];
