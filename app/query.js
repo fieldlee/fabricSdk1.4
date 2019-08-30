@@ -96,7 +96,7 @@ var getTransactionByID = async function(peer, channelName, trxnID, username, org
 			throw new Error(message);
 		}
 
-		let response_payload = await channel.queryTransaction(trxnID, peer);
+		let response_payload = await channel.queryTransaction(trxnID, peer,true);
 		if (response_payload) {
 			logger.debug(response_payload);
 			return response_payload;

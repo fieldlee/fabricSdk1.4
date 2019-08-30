@@ -388,6 +388,61 @@ app.post('/invoke', async function(req, res) {
 		res.json(getErrorMessage('\'args\''));
 		return;
 	}
+//// burn 函数特殊处理
+	if (fcn == "burn"){
+		var hadChecked = false;
+		var arg1 = args[0];
+		var jsonArg =  JSON.parse(arg1);
+		var txid = jsonArg["txid"];
+		var token =  jsonArg["token"];
+		var amount =  jsonArg["amount"];
+		if (!txid){
+			res.json(getErrorMessage('\'arg txid\''));
+			return;
+		}
+		let message = await query.getTransactionByID(peers[0], channelName, txid, username, orgname);
+		logger.debug('message  : ' + JSON.stringify(message));
+		if (typeof message !== "object"){
+			logger.error('message err : ' + message);
+			res.json(getErrorMessage('\'the transcation not exist!\''));
+			return;
+		}else{
+			if (message["transactionEnvelope"] && message["transactionEnvelope"]["payload"]&& message["transactionEnvelope"]["payload"]["data"]&& message["transactionEnvelope"]["payload"]["data"]["actions"]){
+				let actions = message["transactionEnvelope"]["payload"]["data"]["actions"];
+				let args = actions[0]["payload"]["chaincode_proposal_payload"]["input"]["chaincode_spec"]["input"]["args"];
+				for (let index = 0; index < args.length; index++) {
+					let arg = args[index];
+					logger.debug(arg.toString());
+					try {
+						let jsonB =  JSON.parse(arg.toString());
+						if (jsonB["token"] && jsonB["amount"] &&jsonB["to"]){
+								if (jsonB["to"].toUpperCase() != "MMADMIN"){
+									res.json(getErrorMessage('\'transaction err : the transaction to not mmadmin!\''));
+									return 
+								}
+								if (jsonB["token"].toUpperCase() != token.toUpperCase()){
+									res.json(getErrorMessage('\'token err : the transaction token is not the burn token!\''));
+									return 
+								}
+								if (jsonB["amount"] != amount){
+									res.json(getErrorMessage('\'token err : the transaction amount not equite the burn amount!\''));
+									return;
+								}
+								hadChecked=true;
+								break;
+						}
+					} catch (error) {
+						logger.error('json err : ' + error);
+						continue;
+					}
+				}
+			}
+		}
+		if (!hadChecked){
+			res.json(getErrorMessage('\'the transaction is not transfer transaction\''));
+			return;
+		}
+	}
 
 	let message = await invoke.invokeChaincode(peers, channelName, chaincodeName, fcn, args, username, orgname);
 	res.send(message);
